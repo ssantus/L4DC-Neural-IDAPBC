@@ -1,4 +1,4 @@
-from neuralnet import NN
+from utils.neuralnet import NN
 import tensorflow as tf
 import numpy as np
 
@@ -64,6 +64,21 @@ class Simplependulum():
     def hd_fn(self, x, nn = None):
         """Energy neural form for simple pendulum"""
         return self.h_fn(x) + self.ha_fn(x, nn)
+
+    @tf.function
+    def u_fn(self, x, nn=None):
+        with tf.GradientTape(persistent=True) as gradient:
+            gradient.watch(x)
+            h_val = self.h_fn(x,nn)
+            hd_val = self.hd_fn(x, nn)
+        gradH_x = gradient.gradient(h_val, x)
+        J_R = self.j-self.r
+
+        gradHd_x = gradient.gradient(hd_val, x)
+        Jd_Rd = self.jd-self.rd
+
+        u = tf.linalg.matvec(Jd_Rd, gradHd_x) - tf.linalg.matvec(J_R, gradH_x)
+        return u[:,1]
 
     def data_gen_uniform(self):
         #Training data
