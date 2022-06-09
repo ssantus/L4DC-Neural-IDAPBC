@@ -125,7 +125,9 @@ def train_fn(x_train, x_test, config:CONF):
             lastepoch = epoch
             print('TRAINING FINISHED WITH CONVERGENCE AT EPOCH: {}, FINAL TRAINING-LOSS: {:.4f} AND VALIDATION-LOSS: {:.4f}'.format(lastepoch, config.neuralnet.train_tracker.result(), config.neuralnet.validation_tracker.result()))
             break
-    print('TRAINING FINISHED WITHOUT CONVERGENCE, FINAL TRAINING-LOSS: {:.4f} AND VALIDATION-LOSS: {:.4f}'.format(config.neuralnet.train_tracker.result(), config.neuralnet.validation_tracker.result()))
+        lastepoch = epoch
+    if lastepoch == config.neuralnet.epochs:
+        print('TRAINING FINISHED WITHOUT CONVERGENCE, FINAL TRAINING-LOSS: {:.4f} AND VALIDATION-LOSS: {:.4f}'.format(config.neuralnet.train_tracker.result(), config.neuralnet.validation_tracker.result()))
     
     tf.print("Residuals after training: ")
     loss_fn(x_test[0], config, residuals = True)

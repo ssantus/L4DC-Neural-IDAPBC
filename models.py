@@ -55,6 +55,7 @@ class Simplependulum():
             m, g, l = self.parameters
             return - m*g*l*(1-tf.cos(q)) + (q-self.q_star)**2
         elif nn == None:
+            print('Here')
             raise Exception('NN empty')
         else:
             return nn(x)

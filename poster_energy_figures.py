@@ -130,11 +130,7 @@ def plot_multiple_energy(energy1, energy2, energy3, neuralnet, config: CONF, nam
     #Show plot
     # plt.show()
 
-@tf.function
-def energy_poster(x):
-    """Energy function of simple pendulum"""
-    q, p = tf.split(x, 2, axis=1)
-    return 5*p**2 +10*(q-1.5)**2
+
 
 def plot_energy_poster(energy1, energy2, energy3, neuralnet, config: CONF, name1: str = 'insertname1', name2: str = 'insertname2', name3: str = 'insertname3'):
     """Surface plot of the energy function"""
@@ -181,33 +177,6 @@ def plot_energy_poster(energy1, energy2, energy3, neuralnet, config: CONF, name1
     axs[1].legend([fake2Dline1, fake2Dline2], [name1, name2], numpoints=1, loc='upper right', fontsize=13, frameon=False, bbox_to_anchor=(1.04, 0.85))
     axs[2].legend([fake2Dline3], [name3], numpoints=1, loc='upper right', fontsize=13, frameon=False, bbox_to_anchor=(1.04, 0.85))
 
-
-
-    # fig.suptitle('Energy functions', fontsize=12, y=1.)
-
-    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # surf = ax.plot_surface(q_plot, p_plot, energy_values1, linewidth = 0, alpha = 0.15, antialiased = False, label = name1, color = '#225375', zorder=0)
-    # surf = ax.plot_surface(q_plot, p_plot, energy_values2, linewidth = 0, alpha = 0.15, antialiased = False, label = name2, color = '#eb9234', zorder=10)
-    # surf = ax.plot_surface(q_plot3, p_plot3, energy_values3, linewidth = 0, antialiased = False, label = name3, cmap = cm.coolwarm, zorder=200)
-    # fake2Dline1 = mpl.lines.Line2D([0], [0], linestyle="none", color='#1911df', marker='o')
-    # fake2Dline2 = mpl.lines.Line2D([0], [0], linestyle="none", color='#f3874a', marker='o')
-    # fake2Dline3 = mpl.lines.Line2D([0], [0], linestyle="none", color='#f34a58', marker='o')
-
-
-    #Customizing axis.
-    # ax.set_xlim(-config.q_lim + config.q_star, config.q_star + config.q_lim)
-    # ax.set_ylim(-config.p_lim + config.p_star, config.p_star + config.p_lim)
-    # ax.set_zlim(-max_energy, max_energy)
-    # ax.zaxis.set_major_locator(LinearLocator(10))
-
-    #Adding labels
-    # plt.xlabel("q")
-    # plt.ylabel("p")
-    # ax.legend([fake2Dline1, fake2Dline2, fake2Dline3], [name1, name2, name3], numpoints=1, loc='upper left', fontsize=13)
-    # plt.title("Multiple energy plot", fontsize=13)
-
-    #Show plot
-    # plt.show()
     return fig, axs
 
 
