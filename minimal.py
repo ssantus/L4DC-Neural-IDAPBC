@@ -9,7 +9,7 @@ from models import *
 
 
 if __name__ == "__main__":
-    simplependulum = False
+    simplependulum = True
     doublependulum = not simplependulum
 
     if simplependulum:
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         config  = CONF(seed=123)
         config.model = Simplependulum(x_star=[1.3,0.])
         config.model.set_ja(0.)
-        config.model.analytical = False
+        config.model.analytical = True
         config.neuralnet = NN(epochs= 15000, nn_width=60)
         # config.neuralnet = NN(epochs= 10000, activation = lambda x: x**2)
         config.neuralnet.epsilon = 0.1
