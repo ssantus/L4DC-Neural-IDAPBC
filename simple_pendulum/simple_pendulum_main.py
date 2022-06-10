@@ -1,3 +1,13 @@
+"""main.py"""
+import os
+import platform
+pc = platform.system()
+w = False
+if pc == 'Windows':
+    import sys
+    sys.path.insert(1, os.getcwd())
+    w = True
+
 from utils.visualization import *
 from simple_pendulum_training import *
 from simple_pendulum_solver import *
@@ -24,10 +34,14 @@ if __name__ == "__main__":
     # tf.print("Residuals before training: ")
     # loss_fn(x_test[0], config, residuals = True)
     if not config.model.analytical:
-        directory_name = '../weights/L4DC/simple_pendulum_width{}_depth{}.npy'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+        if w:
+            directory_name = 'c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\weights\\L4DC\\simple_pendulum_width{}_depth{}.npy'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+        else:
+            directory_name = '../weights/L4DC/simple_pendulum_width{}_depth{}.npy'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+
         if train == True:
             t_loss, v_loss = train_fn(x_train, x_test, config)
-            np.save(directory_name, config.neuralnet.get_weights(), allow_pickle=True)
+            # np.save(directory_name, config.neuralnet.get_weights(), allow_pickle=True)
             plot_error(t_loss, v_loss, config)
         else:
             try:
@@ -43,7 +57,7 @@ if __name__ == "__main__":
     solver = Timeresponse()
     solver.t_final = 15
     n_trajectories = 30
-    solution = solver.ivp_solve('h', config)
+    solution = solver.ivp_solve('hd', config)
     # solution = solver.ivp_solve('hd', config)
     # fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     plt.tight_layout()

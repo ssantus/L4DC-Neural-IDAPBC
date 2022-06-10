@@ -1,3 +1,12 @@
+import os
+import platform
+pc = platform.system()
+w = False
+if pc == 'Windows':
+    import sys
+    sys.path.insert(1, os.getcwd())
+    w = True
+    
 from utils.visualization import *
 from double_pendulum_training import *
 from double_pendulum_solver import *

@@ -1,4 +1,13 @@
 """solver.py"""
+import os
+import platform
+pc = platform.system()
+w = False
+if pc == 'Windows':
+    import sys
+    sys.path.insert(1, os.getcwd())
+    w = True
+
 from scipy.integrate import solve_ivp
 import sys
 from utils.config import CONF
@@ -152,7 +161,7 @@ if __name__ == '__main__':
     # LOAD WEIGHTS
     # solution = solver.ivp_solve(config.model.hd_fn, config)
     # hd_fn = lambda x: config.model.hd_fn(x, nn=config.neuralnet)
-    solution = solver.ivp_solve(hd_fn, config)
+    solution = solver.ivp_solve('h', config)
     q, p = np.split(solution.y, 2)
     q = q.flatten()
     p = p.flatten()

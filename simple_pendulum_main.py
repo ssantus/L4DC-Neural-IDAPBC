@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # solution = solver.ivp_solve('hd', config)
     fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     plt.tight_layout()
-    image_format = 'svg'
-    image_name = 'simple_pendulum_tresponse.svg'
-    fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
+    # image_format = 'svg'
+    # image_name = 'simple_pendulum_tresponse.svg'
+    # fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
 

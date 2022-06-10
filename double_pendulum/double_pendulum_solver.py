@@ -1,4 +1,13 @@
 """solver.py"""
+import os
+import platform
+pc = platform.system()
+w = False
+if pc == 'Windows':
+    import sys
+    sys.path.insert(1, os.getcwd())
+    w = True
+
 from scipy.integrate import solve_ivp
 import sys
 from utils.config import CONF
@@ -154,10 +163,28 @@ if __name__ == '__main__':
     # LOAD WEIGHTS
     # solution = solver.ivp_solve(config.model.hd_fn, config)
     # hd_fn = lambda x: config.model.hd_fn(x, nn=config.neuralnet)
-    solution = solver.ivp_solve('hd', config)
-    q, p = np.split(solution.y, 4)
-    q = q.flatten()
-    p = p.flatten()
+    x = [[0.,0.,0.,0.],[0.,0.,0.,0.],[0.,0.,0.,0.]]
+    x = tf.constant(x, shape = (len(x),len(x[0])), dtype = tf.float32)
+    q1, q2, p1, p2 = tf.split(x, 4, axis=1)
+    m1, m2, g, l1, l2 = config.model.parameters
+    el11 = tf.ones(shape = (q1.shape[0], q1.shape[1]))*(m1+m2)*l1**2
+    el12 = m2*l1*l2*tf.cos(q1-q2)
+    el21 = m2*l1*l2*tf.cos(q1-q2)
+    el22 = tf.ones(shape = (q1.shape[0], q1.shape[1]))*m2*l2**2
+    tf.print("element 1,1: ",el11)
+    tf.print("element 1,2: ",el12)
+    tf.print("element 2,1: ",el21)
+    tf.print("element 2,2: ",el22)
+    M = tf.constant([el11, el12, el21, el22])
+    # M = tf.constant([[tf.ones(shape = (q1.shape[0], q1.shape[1]))*(m1+m2)*l1**2, m2*l1*l2*tf.cos(q1-q2)], [m2*l1*l2*tf.cos(q1-q2), tf.ones(shape = (q1.shape[0], q1.shape[1]))*m2*l2**2]], shape=(q1.shape[0], 4, 4))
+    tf.print('Inertia matrix: ', M)
+    sol = solver.ph_dynamics(0, x, config.model.h_fn, config)
+    solution = solver.ivp_solve('h', config)
+    q1, q2, p1, p2 = np.split(solution.y, 4)
+    q1 = q1.flatten()
+    q2 = q2.flatten()
+    p1 = p1.flatten()
+    p2 = p2.flatten()
     t = solution.t
 
     fig, axs = plt.subplots(2, 1, sharex='all', figsize=(10, 4))

@@ -1,5 +1,13 @@
 """visualization.py"""
-
+import os
+import platform
+pc = platform.system()
+w = False
+if pc == 'Windows':
+    import sys
+    sys.path.insert(1, os.getcwd())
+    w = True
+    
 import numpy as np
 import tensorflow as tf
 
@@ -197,7 +205,7 @@ def plot_error(training_loss, validation_loss, config:CONF):
 if __name__ == '__main__':
     # Plot figure for poster
     from Simplependulum import *
-    from neuralnet import *
+    from utils.neuralnet import *
     print("Simple pendulum")
 
     config  = CONF(seed=123)
@@ -235,5 +243,8 @@ if __name__ == '__main__':
     image_format = 'svg'
     image_name = 'energy_poster.svg'
     plt.tight_layout()
-    fig.savefig('../figures/'+image_name, format = image_format, dpi=1200, transparent = True)
+    if w:
+        fig.savefig('c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\figures\\test'+image_name, format = image_format, dpi=1200, transparent = True)
+    else:
+        fig.savefig('../figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
