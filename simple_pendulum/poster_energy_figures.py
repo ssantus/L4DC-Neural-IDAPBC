@@ -188,6 +188,52 @@ def plot_energy_poster(energy1, energy2, energy3, neuralnet, config: CONF, name1
     return fig, axs
 
 
+def plot_energy_poster2(energy1, energy2, neuralnet, config: CONF, name1: str = 'insertname1',
+                       name2: str = 'insertname2', name3: str = 'insertname3'):
+    """Surface plot of the energy function"""
+    config = config.model
+
+    # Preparing datapoints
+    q_plot = np.arange(-config.q_lim + config.q_star, config.q_star + config.q_lim, config.delta, dtype=np.float32)
+    p_plot = np.arange(-config.p_lim + config.p_star, config.p_star + config.p_lim, config.delta, dtype=np.float32)
+
+    q_plot, p_plot = np.meshgrid(q_plot, p_plot)
+    q = np.expand_dims(q_plot.flatten(), axis=-1)
+    p = np.expand_dims(p_plot.flatten(), axis=-1)
+
+    energy_values1 = energy1(tf.concat((q, p), axis=1), neuralnet)
+    energy_values2 = energy2(tf.concat((q, p), axis=1), neuralnet)
+
+    max_energy = max(energy_values2)
+    energy_values1 = tf.reshape(energy_values1, q_plot.shape)
+    energy_values2 = tf.reshape(energy_values2, q_plot.shape)
+
+    # Plotting surface
+    fig, axs = plt.subplots(1, 2, subplot_kw={"projection": "3d"}, figsize=(12, 5))
+    axs[0].plot_surface(q_plot, p_plot, energy_values1, linewidth=0, alpha=1., antialiased=False, label=name1,
+                        color='#1911df', zorder=0)
+    # leg = axs[1].legend(loc=0, ncol=2, shadow=True, fancybox=True)
+    axs[1].plot_surface(q_plot, p_plot, energy_values2, linewidth=0, alpha=1.0, antialiased=False, label=name2,
+                        cmap=cm.plasma, zorder=-10000)
+    # leg = axs[2].legend(loc=0, ncol=2, shadow=True, fancybox=True)
+
+    fake2Dline1 = mpl.lines.Line2D([0], [0], linestyle="none", color='#1911df', marker='o')
+    fake2Dline2 = mpl.lines.Line2D([0], [0], linestyle="none", color='#f34a58', marker='o')
+
+    for i in range(2):
+        # axs[i].set_axis_off()
+        axs[i].view_init(elev=5., azim=-70)
+        axs[i].set_xlabel('$q$', labelpad=10)
+        axs[i].set_ylabel('$p$', labelpad=10)
+
+
+    axs[0].legend([fake2Dline1], [name1], numpoints=1, loc='upper right', fontsize=13, frameon=False,
+                  bbox_to_anchor=(1.04, 0.85))
+    axs[1].legend([fake2Dline2], [name2], numpoints=1, loc='upper right', fontsize=13, frameon=False,
+                  bbox_to_anchor=(1.04, 0.85))
+
+    return fig, axs
+
 def plot_error(training_loss, validation_loss, config:CONF):
     fig, ax = plt.subplots()
     line1 = ax.plot(training_loss, label = 'Training loss')
@@ -229,19 +275,28 @@ if __name__ == '__main__':
     config.model.q_lim = 8
     config.model.delta = 0.1
     # plot_nn_energy(config.model.ha_fn, config.neuralnet, config, name='$H_a(x)$')
-    fig, axs = plot_energy_poster(config.model.h_fn, config.model.ha_fn, config.model.hd_fn, config.neuralnet, config, name1='$H(x)$', name2='$H_a(x)$', name3='$H_d(x)$')
 
-    axs[2].scatter(config.model.q_star, config.model.p_star, 0., marker='*', c='red', edgecolors='#1911df',linewidths=1., zorder=10000, s=220)
-    axs[2].text(config.model.q_star+0.6, config.model.p_star+0.6, -7.5, '$x^\star$', fontsize=15)
-    axs[2].computed_zorder = False
+    # Plot energy poster:
+    flag = False
+    if flag:
+        fig, axs = plot_energy_poster(config.model.h_fn, config.model.ha_fn, config.model.hd_fn, config.neuralnet, config, name1='$H(x)$', name2='$H_a(x)$', name3='$H_d(x)$')
 
-    # cmap = plt.get_cmap(cm.plasma)
-    # rgb_cm = cmap.colors  # returns array-like color
-    # print("rgb colormap: ", rgb_cm)
+        axs[2].scatter(config.model.q_star, config.model.p_star, 0., marker='*', c='red', edgecolors='#1911df',linewidths=1., zorder=10000, s=220)
+        axs[2].text(config.model.q_star+0.6, config.model.p_star+0.6, -7.5, '$x^\star$', fontsize=15)
+        axs[2].computed_zorder = False
 
-    # plt.subplots_adjust(wspace=-100, hspace=-10000)
+    # Plot energy poster2:
+    fig, axs = plot_energy_poster2(config.model.h_fn, config.model.hd_fn, config.neuralnet, config, name1='$H(x)$', name2='$H_a(x)$', name3='$H_d(x)$')
+    for i in range(2):
+        axs[i].scatter(config.model.q_star, config.model.p_star, 0., marker='*', c='red', edgecolors='#1911df',
+                       linewidths=1., zorder=10000, s=220)
+        axs[i].computed_zorder = False
+
+    axs[0].text(config.model.q_star + 0.6, config.model.p_star + 0.6, -2.8, '$x^\star$', fontsize=15)
+    axs[1].text(config.model.q_star + 0.6, config.model.p_star + 0.6, -7.5, '$x^\star$', fontsize=15)
+
     image_format = 'svg'
-    image_name = 'energy_poster.svg'
+    image_name = 'energy_poster2.svg'
     plt.tight_layout()
     if w:
         fig.savefig('c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\figures\\test'+image_name, format = image_format, dpi=1200, transparent = True)
