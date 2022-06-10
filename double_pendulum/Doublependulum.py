@@ -47,7 +47,15 @@ class Doublependulum():
         """Energy function of simple pendulum"""
         q1, q2, p1, p2 = tf.split(x, 4, axis=1)
         m1, m2, g, l1, l2 = self.parameters
-        M = tf.constant([[tf.ones(shape = q1.shape[0])*(m1+m2)*l1**2, m2*l1*l2*tf.cos(q1-q2)], [m2*l1*l2*tf.cos(q1-q2), tf.ones(shape = q1.shape[0])*m2*l2**2]], shape=(q1.shape[0], 4, 4))
+
+        m11 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * (m1 + m2) * l1 ** 2
+        m12 = m2 * l1 * l2 * tf.cos(q1 - q2)
+        m22 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * m2 * l2 ** 2
+
+        M = tf.concat([m11, m12, m12, m22], 0)
+        M = tf.split(M, q1.shape[0], 1)
+        M = tf.reshape(M, [-1, 2, 2])
+
         iM = tf.linalg.inv(M)
         p = tf.concat((p1, p2), 1)
         K = 0.5*tf.reduce_sum(tf.multiply(p, tf.linalg.matvec(iM, p)), axis = 1)

@@ -49,19 +49,11 @@ if __name__ == "__main__":
     # plot_nn_energy(config.model.ha_fn, config.neuralnet, config)
     # plot_multiple_energy(config.model.h_fn, config.model.ha_fn, config.model.hd_fn, config.neuralnet, config)
 
-    x = tf.constant([0.,0.,0.,0.], shape=(1,4))
-    q1, q2, p1, p2 = tf.split(x, 4, axis=1)
-    m1, m2, g, l1, l2 = config.model.parameters
-    M = tf.constant(
-        [[tf.ones_like(q1)*(m1 + m2) * l1 ** 2, m2 * l1 * l2 * tf.cos(q1 - q2)], [m2 * l1 * l2 * tf.cos(q1 - q2), tf.ones_like(q1)*m2 * l2 ** 2]],
-        shape=(1, 4, 4))
-    tf.print(M)
-    tf.print(config.model.h_fn(x))
     solver = Timeresponse()
     solver.t_final = 15
     n_trajectories = 30
     solution = solver.ivp_solve('h', config)
-    solution = solver.ivp_solve('hd', config)
+    # solution = solver.ivp_solve('hd', config)
     # fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     # plt.tight_layout()
     # image_format = 'svg'

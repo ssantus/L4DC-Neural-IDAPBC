@@ -45,11 +45,11 @@ class Timeresponse():
         """
         t_eval = np.linspace(self.t_start, self.t_final, int(self.resolution*(self.t_final- self.t_start)))
 
-        fig, axs = plt.subplots(2, 1, sharex='all', figsize=(10, 4))
+        # fig, axs = plt.subplots(2, 1, sharex='all', figsize=(10, 4))
 
         if energy_fn == 'h':
             response = 'Open-loop response'
-            fig.suptitle('IDA-PBC '+ response, y=1.)
+            # fig.suptitle('IDA-PBC '+ response, y=1.)
             print(response)
             try:
                 # solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.h_fn, config), t_span = [self.t_start, self.t_final], y0 = self.x0, t_eval = t_eval, rtol = self.rtol)
@@ -59,7 +59,7 @@ class Timeresponse():
                 sys.exit()
         elif energy_fn == 'hd':
             response = 'Closed-loop response'
-            fig.suptitle('IDA-PBC '+ response, y=1.)
+            # fig.suptitle('IDA-PBC '+ response, y=1.)
             print(response)
             try:
                 solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.hd_fn, config), t_span = [self.t_start, self.t_final], y0 = self.x0, t_eval = t_eval, rtol = self.rtol)
@@ -67,17 +67,17 @@ class Timeresponse():
                 print("Please define a neural network for the auxiliary energy function, use set_nn(your_nn)")
                 sys.exit()
 
-        q1, q2, p1, p2 = np.split(solution.y, 4)
-        q1 = q1.flatten()
-        q2 = q2.flatten()
-        p1 = p1.flatten()
-        p2 = p2.flatten()
-        t = solution.t
-
-        axs[0].plot(t, q1, label="$q_1(t)$")
-        leg = axs[0].legend(loc=0, ncol=2, shadow=True, fancybox=True)
-        axs[1].plot(t, q2, label="$q_2(t)$")
-        leg = axs[1].legend(loc=0, ncol=2, shadow=True, fancybox=True)
+        # q1, q2, p1, p2 = np.split(solution.y, 4)
+        # q1 = q1.flatten()
+        # q2 = q2.flatten()
+        # p1 = p1.flatten()
+        # p2 = p2.flatten()
+        # t = solution.t
+        #
+        # axs[0].plot(t, q1, label="$q_1(t)$")
+        # leg = axs[0].legend(loc=0, ncol=2, shadow=True, fancybox=True)
+        # axs[1].plot(t, q2, label="$q_2(t)$")
+        # leg = axs[1].legend(loc=0, ncol=2, shadow=True, fancybox=True)
 
         return solution
     #
@@ -157,28 +157,14 @@ if __name__ == '__main__':
     config  = CONF(seed=123)
     config.model = Doublependulum(x_star=[0.,1.,0.,0.])
     config.model.set_ja(0.,0.)
+    config.model.set_ra(0.5,0.5)
     config.model.analytical = False
     config.neuralnet = NN(epochs= 15000, nn_width=60)
     # config = CONF()
     # LOAD WEIGHTS
     # solution = solver.ivp_solve(config.model.hd_fn, config)
     # hd_fn = lambda x: config.model.hd_fn(x, nn=config.neuralnet)
-    x = [[0.,0.,0.,0.],[0.,0.,0.,0.],[0.,0.,0.,0.]]
-    x = tf.constant(x, shape = (len(x),len(x[0])), dtype = tf.float32)
-    q1, q2, p1, p2 = tf.split(x, 4, axis=1)
-    m1, m2, g, l1, l2 = config.model.parameters
-    el11 = tf.ones(shape = (q1.shape[0], q1.shape[1]))*(m1+m2)*l1**2
-    el12 = m2*l1*l2*tf.cos(q1-q2)
-    el21 = m2*l1*l2*tf.cos(q1-q2)
-    el22 = tf.ones(shape = (q1.shape[0], q1.shape[1]))*m2*l2**2
-    tf.print("element 1,1: ",el11)
-    tf.print("element 1,2: ",el12)
-    tf.print("element 2,1: ",el21)
-    tf.print("element 2,2: ",el22)
-    M = tf.constant([el11, el12, el21, el22])
-    # M = tf.constant([[tf.ones(shape = (q1.shape[0], q1.shape[1]))*(m1+m2)*l1**2, m2*l1*l2*tf.cos(q1-q2)], [m2*l1*l2*tf.cos(q1-q2), tf.ones(shape = (q1.shape[0], q1.shape[1]))*m2*l2**2]], shape=(q1.shape[0], 4, 4))
-    tf.print('Inertia matrix: ', M)
-    sol = solver.ph_dynamics(0, x, config.model.h_fn, config)
+
     solution = solver.ivp_solve('h', config)
     q1, q2, p1, p2 = np.split(solution.y, 4)
     q1 = q1.flatten()
@@ -188,9 +174,11 @@ if __name__ == '__main__':
     t = solution.t
 
     fig, axs = plt.subplots(2, 1, sharex='all', figsize=(10, 4))
-    axs[0].plot(t, q, label="$q(t)$")
+    axs[0].plot(t, q1, label="$q1(t)$")
+    axs[0].plot(t, q2, label="$q2(t)$")
     leg = axs[0].legend(loc=0, ncol=2, shadow=True, fancybox=True)
-    axs[1].plot(t, p, label="$p(t)$")
+    axs[1].plot(t, p1, label="$p1(t)$")
+    axs[1].plot(t, p2, label="$p2(t)$")
     leg = axs[1].legend(loc=0, ncol=2, shadow=True, fancybox=True)
     fig.suptitle('IDA-PBC Open-loop dynamics', fontsize=12, y=1.)
     plt.show()
