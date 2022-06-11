@@ -6,8 +6,8 @@ import numpy as np
 class Simplependulum():
     def __init__(self, parameters = [1., 9.81, 1.], x_star = [0., 0.], j = [[0., 1.],[-1., 0.]], r = [[0., 0.],[0., 0.]], g=[0.,1.], g_perp=[1., 0.]):
         # System definition
-        self.h_dim_in = 2 # number of arguments in energy function
-        self.h_dim_out = 1 # energy is a scalar function
+        self.dim_in = 2 # number of arguments in energy function
+        self.dim_out = 1 # energy is a scalar function
         self.parameters = parameters # m , g, l
         self.set_x_star(x_star)
         self.j = tf.constant(j, shape = (1,2,2))

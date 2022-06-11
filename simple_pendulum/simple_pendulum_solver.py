@@ -94,7 +94,7 @@ class Timeresponse():
         for q0 in q0s:
             if energy_fn == 'h':
                 response = 'Open-loop response'
-                fig.suptitle('IDA-PBC '+ response, y=1.)
+                fig.suptitle('Simple Pendulum IDA-PBC '+ response, y=1.)
                 # print(response)
                 try:
                     solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.h_fn, config), t_span = [self.t_start, self.t_final], y0 = [q0, 0.], t_eval = t_eval, rtol = self.rtol)
@@ -103,7 +103,7 @@ class Timeresponse():
                     sys.exit()
             elif energy_fn == 'hd':
                 response = 'Closed-loop response'
-                fig.suptitle('Neural IDA-PBC '+ response, y=1.)
+                fig.suptitle('Simple Pendulum Neural IDA-PBC '+ response, y=1.)
                 # print(response)
                 try:
                     solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.hd_fn, config), t_span = [self.t_start, self.t_final], y0 = [q0, 0.], t_eval = t_eval, rtol = self.rtol)

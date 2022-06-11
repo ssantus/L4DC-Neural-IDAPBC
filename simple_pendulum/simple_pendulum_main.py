@@ -16,7 +16,6 @@ from Simplependulum import *
 
 if __name__ == "__main__":
     print("Simple pendulum")
-    train = False
 
     config  = CONF(seed=123)
     config.model = Simplependulum(x_star=[1.5,0.])
@@ -31,6 +30,7 @@ if __name__ == "__main__":
     # n_samples = config.neuralnet.model.count_params()
     # x_train, x_test = config.model.generate_data_random(n_samples, config.seed)
 
+    train = False
     # tf.print("Residuals before training: ")
     # loss_fn(x_test[0], config, residuals = True)
     if not config.model.analytical:
@@ -56,13 +56,13 @@ if __name__ == "__main__":
 
     solver = Timeresponse()
     solver.t_final = 15
-    n_trajectories = 30
-    solution = solver.ivp_solve('hd', config)
+    n_trajectories = 15
+    # solution = solver.ivp_solve('h', config)
     # solution = solver.ivp_solve('hd', config)
-    # fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
+    fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     plt.tight_layout()
-    # image_format = 'svg'
-    # image_name = 'simple_pendulum_tresponse.svg'
-    # fig.savefig('../figures/'+image_name, format = image_format, dpi=1200, transparent = True)
+    image_format = 'svg'
+    image_name = 'simple_pendulum_width{}_depth{}_tresponse.svg'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+    fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
 

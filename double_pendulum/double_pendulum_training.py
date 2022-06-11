@@ -40,7 +40,7 @@ def loss_fn(x, config:CONF, residuals=False):
     jd_rd_grad_hd = tf.linalg.matvec(jd_rd, grad_hd_val) # (Jd-Rd)*gradHd
     # g_perp_jd_rd_grad_hd = tf.multiply(g_perp, jd_rd_grad_hd)# g^perp*(Jd-Rd)*gradHd
     # match_residual = tf.reduce_mean(tf.reduce_sum(tf.square(g_perp_jd_rd_grad_hd-g_perp_j_r_grad_h),1)) # Add over each sample and mean over all the samples
-    match_residual = tf.reduce_mean(tf.square(jd_rd_grad_hd[:,0] - j_r_grad_h[:,0]))
+    match_residual = tf.reduce_mean(tf.square(jd_rd_grad_hd[:,0] - j_r_grad_h[:,0])) + tf.reduce_mean(tf.square(jd_rd_grad_hd[:,1] - j_r_grad_h[:,1]))
     # tf.print("Match residual: ", match_residual)
 
     #Min residual

@@ -6,8 +6,8 @@ import numpy as np
 class Doublependulum():
     def __init__(self, parameters = [1., 1., 9.81, 1., 1.], x_star = [0., 0.], j = [[0.,0., 1.,0.],[0.,0., 0.,1.],[-1., 0., 0.,0.],[0., -1., 0.,0.]], r = [[0.,0.,0., 0.],[0.,0.,0., 0.],[0.,0.,0., 0.],[0.,0.,0., 0.]], g=[[0.,0.],[0.,0.],[1.,0.],[0.,1.]], g_perp=[[1.,0.],[0.,1.],[0.,0.],[0.,0.]]):
         # System definition
-        self.h_dim_in = 4 # number of arguments in energy function
-        self.h_dim_out = 1 # energy is a scalar function
+        self.dim_in = 4 # number of arguments in energy function
+        self.dim_out = 1 # energy is a scalar function
         self.parameters = parameters # m1, m2 , g, l1, l2
         self.set_x_star(x_star)
         self.j = tf.constant(j, shape = (1,4,4))
@@ -48,25 +48,30 @@ class Doublependulum():
         q1, q2, p1, p2 = tf.split(x, 4, axis=1)
         m1, m2, g, l1, l2 = self.parameters
 
-        m11 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * (m1 + m2) * l1 ** 2
-        m12 = m2 * l1 * l2 * tf.cos(q1 - q2)
-        m22 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * m2 * l2 ** 2
+        # m11 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * (m1 + m2) * l1 ** 2
+        # m12 = m2 * l1 * l2 * tf.cos(q1 - q2)
+        # m22 = tf.ones(shape=(q1.shape[0], q1.shape[1])) * m2 * l2 ** 2
 
-        M = tf.concat([m11, m12, m12, m22], 0)
-        M = tf.split(M, q1.shape[0], 1)
-        M = tf.reshape(M, [-1, 2, 2])
+        # M = tf.concat([m11, m12, m12, m22], 0)
+        # M = tf.split(M, q1.shape[0], 0)
+        # M = tf.reshape(M, [-1, 2, 2])
 
-        iM = tf.linalg.inv(M)
-        p = tf.concat((p1, p2), 1)
-        K = 0.5*tf.reduce_sum(tf.multiply(p, tf.linalg.matvec(iM, p)), axis = 1)
-        V = (m1+m2)*g*l1*(1-tf.cos(q1)) + m2*g*l2*(1-tf.cos(q2))
+        # iM = tf.linalg.inv(M)
+        # p = tf.concat((p1, p2), 1)
+        # K = 0.5*tf.reduce_sum(tf.multiply(p, tf.linalg.matvec(iM, p)), axis = 1)
+        # V = (m1+m2)*g*l1*(1-tf.cos(q1)) + m2*g*l2*(1-tf.cos(q2))
+
+        K = p2*((p2*(m1 + m2))/(2*(- l2**2*m2**2*tf.cos(q1 - q2)**2 + l2**2*m2**2 + m1*l2**2*m2)) - (p1*tf.cos(q1 - q2))/(2*(- l1*l2*m2*tf.cos(q1 - q2)**2 + l1*l2*m1 + l1*l2*m2))) + \
+            p1*(p1/(2*(l1**2*m1 + l1**2*m2 - l1**2*m2*tf.cos(q1 - q2)**2)) - (p2*tf.cos(q1 - q2))/(2*(- l1*l2*m2*tf.cos(q1 - q2)**2 + l1*l2*m1 + l1*l2*m2)))
+        V = - g*l1*(tf.cos(q1) - 1)*(m1 + m2) - g*l2*m2*(tf.cos(q2) - 1)
         return K + V
+
 
     @tf.function
     def ha_fn(self, x, nn = None):
         """Auxiliary energy neural form for simple pendulum"""
         if self.analytical == True:
-            q1, q2, p1, p2 = tf.split(x, 2, axis=1)
+            q1, q2, p1, p2 = tf.split(x, 4, axis=1)
             m1, m2, g, l1, l2 = self.parameters
             V = (m1 + m2) * g * l1 * (1 - tf.cos(q1)) + m2 * g * l2 * (1 - tf.cos(q2))
             return - V + (q1-self.q1_star)**2 + (q2-self.q2_star)**2
