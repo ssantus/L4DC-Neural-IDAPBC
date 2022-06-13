@@ -13,7 +13,8 @@ def loss_fn(x, config:CONF, residuals=False):
             hd_val = config.model.hd_fn(x, config.neuralnet)
         grad_hd_val = gradient.gradient(hd_val, x)
     
-    #Matching equation residual
+
+    # Matching equation residual
     with tf.GradientTape() as gradient:
         gradient.watch(x)
         h_val = config.model.h_fn(x, config)  # Return ha(x)
@@ -28,8 +29,8 @@ def loss_fn(x, config:CONF, residuals=False):
     match_residual = tf.reduce_mean(tf.square(jd_rd_grad_hd[:,0] - j_r_grad_h[:,0])) + tf.reduce_mean(tf.square(jd_rd_grad_hd[:,1] - j_r_grad_h[:,1])) # gperp[(Jd-Rd)*gradHd-(J-R)*gradH]=0
 
 
-    #Structure residuals
-    #Positive definite residual: x^T A x > 0 test
+    # Structure residuals
+    # Positive definite residual: x^T A x > 0 test
     hesshd_val = hessian.batch_jacobian(grad_hd_val, x, unconnected_gradients='zero')
 
     xTA = tf.linalg.matvec(hesshd_val, x)
@@ -37,14 +38,14 @@ def loss_fn(x, config:CONF, residuals=False):
     xTAx_residual = tf.reduce_mean(tf.nn.relu(config.neuralnet.epsilon-xTAx))
     pdef_residual = xTAx_residual
 
-    #Minimum at x^\star residual
+    # Minimum at x^\star residual
     with tf.GradientTape() as gradient:
         gradient.watch(x_star)
         val_x_star = config.model.hd_fn(x_star, config.neuralnet)
     grad_x_star = gradient.gradient(val_x_star, x_star)
     min_residual = tf.reduce_mean(tf.square(val_x_star) + tf.reduce_sum(tf.square(grad_x_star)))
 
-    #Positive values residual
+    # Positive values residual
     positive_residual = tf.reduce_mean(tf.nn.relu(-hd_val)) # H > 0
 
     # OBJECTIVE FUNCTION

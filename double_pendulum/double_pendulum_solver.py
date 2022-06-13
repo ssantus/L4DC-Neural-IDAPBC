@@ -16,6 +16,7 @@ class Timeresponse():
         self.rtol = rtol
         self.method = method
 
+
     def ph_dynamics(self, t, x, energy_fn, config: CONF):
         """
         Compute the port hamiltonian gradients in the form:
@@ -31,6 +32,7 @@ class Timeresponse():
         xdot = tf.linalg.matvec((J-R), gradH_x)
         return xdot.numpy()[0]
     
+
     def ivp_solve(self, energy_fn:str, config: CONF):
         """
         Solve initial value problem
@@ -45,7 +47,6 @@ class Timeresponse():
             fig.suptitle('IDA-PBC '+ response, y=1.)
             print(response)
             try:
-                # solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.h_fn, config), t_span = [self.t_start, self.t_final], y0 = self.x0, t_eval = t_eval, rtol = self.rtol)
                 solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.h_fn, config), t_span = [self.t_start, self.t_final], y0 = self.x0, t_eval = t_eval, rtol = self.rtol)
             except:
                 print("Please define a neural network for the auxiliary energy function, use set_nn(your_nn)")
@@ -77,6 +78,7 @@ class Timeresponse():
 
         return solution
     
+
     def ivp_multiple_solve(self, energy_fn:str, config: CONF, n_trajectories):
         """
         Solve initial value problem for multiple initial conditions, works the same way as ivp_solve
@@ -94,7 +96,6 @@ class Timeresponse():
             if energy_fn == 'h':
                 response = 'Open-loop response'
                 fig.suptitle('Double Pendulum IDA-PBC '+ response, y=1.)
-                # print(response)
                 try:
                     solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.h_fn, config), t_span = [self.t_start, self.t_final], y0 = [q0, q0, 0., 0.], t_eval = t_eval, rtol = self.rtol)
                 except:
@@ -103,7 +104,6 @@ class Timeresponse():
             elif energy_fn == 'hd':
                 response = 'Closed-loop response'
                 fig.suptitle('Double Pendulum Neural IDA-PBC '+ response, y=1.)
-                # print(response)
                 try:
                     solution = solve_ivp(fun = self.ph_dynamics, method = self.method, args=(config.model.hd_fn, config), t_span = [self.t_start, self.t_final], y0 = [q0, q0, 0., 0.], t_eval = t_eval, rtol = self.rtol)
                 except:
@@ -145,12 +145,11 @@ class Timeresponse():
         textstr = '\n'.join((
             r'$R=0, R_a=diag(%.1f)$' % (config.model.ra[0,2,2]),
             r'$x^\star=(%.1f,%.1f,0,0)$' % (config.model.q1_star,config.model.q2_star)))
-        # these are matplotlib.patch.Patch properties
+        # matplotlib.patch.Patch properties
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-        # place a text box in upper left in axes coords
+        # Place the text box in the figure
         axs[0].text(0.52, 0.20, textstr, transform=axs[0].transAxes,
                 verticalalignment='top', bbox=props)
-    
     
         plt.xticks(fontsize=12)
         plt.yticks(fontsize=12)

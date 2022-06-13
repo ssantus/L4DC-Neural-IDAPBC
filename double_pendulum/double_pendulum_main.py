@@ -1,4 +1,9 @@
 """double_pendulum_main.py"""
+import sys
+import os
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 from utils.visualization import *
 from double_pendulum_training import *
 from double_pendulum_solver import *
@@ -27,7 +32,7 @@ if __name__ == "__main__":
 
         if train == True:
             t_loss, v_loss = train_fn(x_train, x_test, config)
-            np.save(directory_name, config.neuralnet.get_weights(), allow_pickle=True)
+            # np.save(directory_name, config.neuralnet.get_weights(), allow_pickle=True)
             plot_error(t_loss, v_loss, config)
         else:
             try:
@@ -39,6 +44,7 @@ if __name__ == "__main__":
 
 
     # Solve
+    # Time response
     solver = Timeresponse()
     solver.t_final = 15
     n_trajectories = 15
@@ -46,7 +52,7 @@ if __name__ == "__main__":
     fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     plt.tight_layout()
     image_format = 'svg'
-    image_name = name+'_tresponse.svg'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
-    fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
+    image_name = name+'_tresponse.svg'
+    # fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
 

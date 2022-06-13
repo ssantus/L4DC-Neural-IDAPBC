@@ -1,5 +1,4 @@
 """visualization.py"""
-
 import numpy as np
 import tensorflow as tf
 
@@ -10,9 +9,9 @@ from matplotlib.ticker import LinearLocator
 
 from utils.config import CONF
 
-def plot_energy(energy, config: CONF, name: str = 'insertname'):
-    """Surface plot of the energy function"""
 
+def plot_energy(energy, config: CONF, name: str = 'insertname'):
+    """Surface plot of the one energy function"""
     #Preparing datapoints
     q_plot = np.arange(-config.q_lim + config.q_star, config.q_star + config.q_lim, config.delta)
     p_plot = np.arange(-config.p_lim + config.p_star, config.p_star + config.p_lim, config.delta)
@@ -48,7 +47,7 @@ def plot_energy(energy, config: CONF, name: str = 'insertname'):
 
 
 def plot_nn_energy(energy, neuralnet, config: CONF, name: str = 'insertname'):
-    """Surface plot of the energy function"""
+    """Surface plot of the Neural energy function"""
     config = config.model
 
     #Preparing datapoints
@@ -60,7 +59,7 @@ def plot_nn_energy(energy, neuralnet, config: CONF, name: str = 'insertname'):
     p = np.expand_dims(p_plot.flatten(), axis=-1)
 
     energy_values = energy(tf.concat((q, p), axis = 1), neuralnet)
-    max_energy = max(energy_values)
+    max_energy = max(abs(max(energy_values)), abs(min(energy_values)))
     energy_values = tf.reshape(energy_values, q_plot.shape)
 
     #Plotting surface
@@ -86,7 +85,7 @@ def plot_nn_energy(energy, neuralnet, config: CONF, name: str = 'insertname'):
 
 
 def plot_multiple_energy(energy1, energy2, energy3, neuralnet, config: CONF, name1: str = 'insertname1', name2: str = 'insertname2', name3: str = 'insertname3'):
-    """Surface plot of the energy function"""
+    """Surface plot of multiple energy function"""
     config = config.model
 
     #Preparing datapoints
@@ -132,6 +131,7 @@ def plot_multiple_energy(energy1, energy2, energy3, neuralnet, config: CONF, nam
 
 
 def plot_error(training_loss, validation_loss, config:CONF):
+    """Plot trainind and validation errors"""
     fig, ax = plt.subplots()
     line1 = ax.plot(training_loss, label = 'Training loss')
     line2 = ax.plot(validation_loss, label = 'Validation loss')
@@ -144,3 +144,6 @@ def plot_error(training_loss, validation_loss, config:CONF):
     #Show plot
     # plt.show()
 
+
+if __name__ == '__main__':
+    pass

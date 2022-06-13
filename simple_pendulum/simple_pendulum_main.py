@@ -1,12 +1,8 @@
 """main.py"""
+import sys
 import os
-import platform
-pc = platform.system()
-w = False
-if pc == 'Windows':
-    import sys
-    sys.path.insert(1, os.getcwd())
-    w = True
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from utils.visualization import *
 from simple_pendulum_training import *
@@ -16,28 +12,23 @@ from Simplependulum import *
 
 if __name__ == "__main__":
     print("Simple pendulum")
-
+    # Setup
     config  = CONF(seed=123)
     config.model = Simplependulum(x_star=[1.5,0.])
     config.model.set_ja(0.)
     config.model.set_ra(0.7)
     config.model.analytical = False
     config.neuralnet = NN(epochs= 15000, nn_width=60)
-    # config.neuralnet = NN(epochs= 10000, activation = lambda x: x**2)
     config.neuralnet.epsilon = 0.1
 
+    # Data
     x_train, x_test = config.model.data_gen_uniform()
-    # n_samples = config.neuralnet.model.count_params()
-    # x_train, x_test = config.model.generate_data_random(n_samples, config.seed)
 
+    # Train
     train = False
-    # tf.print("Residuals before training: ")
-    # loss_fn(x_test[0], config, residuals = True)
     if not config.model.analytical:
-        if w:
-            directory_name = 'c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\weights\\L4DC\\simple_pendulum_width{}_depth{}.npy'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
-        else:
-            directory_name = '../weights/L4DC/simple_pendulum_width{}_depth{}.npy'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+        name = 'simple_pendulum_width{}_depth{}'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
+        directory_name = 'weights/L4DC/'+name+'.npy'
 
         if train == True:
             t_loss, v_loss = train_fn(x_train, x_test, config)
@@ -51,18 +42,21 @@ if __name__ == "__main__":
             except:
                 print("Make sure that the weights you are trying to load exist and that the size fits with the current NN.")
 
-    # plot_nn_energy(config.model.ha_fn, config.neuralnet, config)
-    # plot_multiple_energy(config.model.h_fn, config.model.ha_fn, config.model.hd_fn, config.neuralnet, config)
 
+    # Solve
+    # 1. Plot energy functions
+    plot_nn_energy(config.model.ha_fn, config.neuralnet, config, name='$H_a(\\theta;x)$')
+    plot_multiple_energy(config.model.h_fn, config.model.ha_fn, config.model.hd_fn, config.neuralnet, config, name1 = '$H(x)$', name2 = '$H_a(\\theta;x)$', name3 = '$H_d(\\theta;x)$')
+
+    # 2. Time response
     solver = Timeresponse()
     solver.t_final = 15
     n_trajectories = 15
-    # solution = solver.ivp_solve('h', config)
-    # solution = solver.ivp_solve('hd', config)
+
     fig = solver.ivp_multiple_solve('hd', config, n_trajectories)
     plt.tight_layout()
     image_format = 'svg'
-    image_name = 'simple_pendulum_width{}_depth{}_tresponse.svg'.format(config.neuralnet.nn_width, config.neuralnet.nn_depth)
-    fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
+    image_name = name + '_tresponse.svg'
+    # fig.savefig('figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
 

@@ -1,9 +1,12 @@
+"""Simplependulum.py"""
 from utils.neuralnet import NN
 import tensorflow as tf
 import numpy as np
 
 
 class Simplependulum():
+    """Class specialized to the simple pendulum example. It contains:
+    physical parameters, ph-system parameters, openloop and closed loop energy functions, control function and data generation functions"""
     def __init__(self, parameters = [1., 9.81, 1.], x_star = [0., 0.], j = [[0., 1.],[-1., 0.]], r = [[0., 0.],[0., 0.]], g=[0.,1.], g_perp=[1., 0.]):
         # System definition
         self.dim_in = 2 # number of arguments in energy function
@@ -25,31 +28,41 @@ class Simplependulum():
         self.split = 0.7
         self.batch_size = 256
 
+
     def set_x_star(self, x_star):
+        """Use this function if you want to change the desired setpoint after creating the doublependulum object"""
         self.x_star = tf.constant(x_star, shape=(1,2))
         self.q_star, self.p_star = self.x_star[0]
 
+
     def set_ja(self, ja: float):
+        """IDA-PBC Ja (skew-symmetric"""
         self.ja = tf.constant([[0., ja],[-ja, 0.]], shape=(1,2,2))
         self.jd = self.j + self.ja
 
+
     def set_ra(self, ra: float):
+        """IDA-PBC Ra (positive semidefinite)"""
         self.ra = tf.constant([[0., 0.],[0., ra]], shape=(1,2,2))
         self.rd = self.r + self.ra
 
+
     def set_nn(self, nn: NN):
+        """Neural IDA-PBC Ha"""
         self.nn = nn
+
 
     @tf.function
     def h_fn(self, x, nn = None):
-        """Energy function of simple pendulum"""
+        """Openloop energy function"""
         q, p = tf.split(x, 2, axis=1)
         m, g, l = self.parameters
         return (1/(2*m*l**2))*p**2 + m*g*l*(1-tf.cos(q))
 
+
     @tf.function
     def ha_fn(self, x, nn = None):
-        """Auxiliary energy neural form for simple pendulum"""
+        """IDA-PBC Ha: Auxiliary energy function"""
         if self.analytical == True:
             q, p = tf.split(x, 2, axis=1)
             m, g, l = self.parameters
@@ -59,13 +72,16 @@ class Simplependulum():
         else:
             return nn(x)
 
+
     @tf.function
     def hd_fn(self, x, nn = None):
-        """Energy neural form for simple pendulum"""
+        """IDA-PBC Hd: Auxiliary energy function"""
         return self.h_fn(x) + self.ha_fn(x, nn)
+
 
     @tf.function
     def u_fn(self, x, nn=None):
+        """IDA-PBC control function (for plotting purposes)"""
         with tf.GradientTape(persistent=True) as gradient:
             gradient.watch(x)
             h_val = self.h_fn(x,nn)
@@ -79,7 +95,9 @@ class Simplependulum():
         u = tf.linalg.matvec(Jd_Rd, gradHd_x) - tf.linalg.matvec(J_R, gradH_x)
         return u[:,1]
 
+
     def data_gen_uniform(self):
+        """Uniform data generation: discretization of the state space in a grid form of resolution given by self.delta"""
         #Training data
         q = np.arange(-self.q_lim + self.q_star, self.q_star + self.q_lim, self.delta, dtype=np.float32)
         p = np.arange(-self.p_lim + self.p_star, self.p_star + self.p_lim, self.delta, dtype=np.float32)
@@ -102,7 +120,9 @@ class Simplependulum():
         tf.print("Number of validation samples: ", x_test.shape[0]*x_test.shape[1])
         return x_train, x_test
 
+
     def generate_data_random(self, n_samples, seed):
+        """Random data generation: the state space is sampled n_samples times""" 
         #Training data
         q = np.random.uniform(low = -self.q_lim + self.q_star, high = self.q_star + self.q_lim, size = n_samples).astype(np.float32).flatten()
         p = np.random.uniform(low = -self.p_lim + self.p_star, high = self.p_star + self.p_lim, size = n_samples).astype(np.float32).flatten()

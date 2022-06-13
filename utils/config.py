@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 
 class CONF():
+    """Contains general config parameters"""
     def __init__(self, seed=123) -> None:
         self.set_seed(seed)
         self.model = None

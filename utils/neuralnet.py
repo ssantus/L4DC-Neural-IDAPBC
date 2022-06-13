@@ -4,7 +4,7 @@ import numpy as np
 
 
 class NN(tf.keras.Model):
-
+    """Creates the neural network"""
     def __init__(self, dim_in = 2, dim_out = 1, nn_width = 12, nn_depth = 1, activation = 'tanh', epochs = 5000) -> None:
         super(NN, self).__init__()
 
@@ -28,10 +28,12 @@ class NN(tf.keras.Model):
         self.print_period = 100
         self.print_residuals = True
 
+
     def set_nn_arch(self, nn_width:int, nn_depth:int):
         self.nn_width = nn_width
         self.nn_depth = nn_depth
         self.nn_layers = [self.nn_width]*self.nn_depth
+
 
     def init_network(self):
         initializer = tf.keras.initializers.GlorotUniform()
@@ -39,6 +41,7 @@ class NN(tf.keras.Model):
         for neurons in self.nn_layers:
             self.model.add(tf.keras.layers.Dense(neurons, activation = self.nn_activation, kernel_initializer = initializer))
         self.model.add(tf.keras.layers.Dense(self.nn_output_dim))
+
 
     def call(self, x):
         return self.model(x)
