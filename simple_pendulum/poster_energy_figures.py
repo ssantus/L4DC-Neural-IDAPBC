@@ -286,7 +286,7 @@ if __name__ == '__main__':
         axs[2].computed_zorder = False
 
     # Plot energy poster2:
-    fig, axs = plot_energy_poster2(config.model.h_fn, config.model.hd_fn, config.neuralnet, config, name1='$H(x)$', name2='$H_a(x)$', name3='$H_d(x)$')
+    fig, axs = plot_energy_poster2(config.model.h_fn, config.model.hd_fn, config.neuralnet, config, name1='$H(x)$', name2='$H_d(x)$', name3='$H_d(x)$')
     for i in range(2):
         axs[i].scatter(config.model.q_star, config.model.p_star, 0., marker='*', c='red', edgecolors='#1911df',
                        linewidths=1., zorder=10000, s=220)
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     image_name = 'energy_poster2.svg'
     plt.tight_layout()
     if w:
-        fig.savefig('c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\figures\\test'+image_name, format = image_format, dpi=1200, transparent = True)
+        fig.savefig('c:\\Users\\ssanc\\Documents\\GitHub\\Total-Energy-Shaping-Neural-IDAPBC\\figures\\'+image_name, format = image_format, dpi=1200, transparent = True)
     else:
         fig.savefig('../figures/'+image_name, format = image_format, dpi=1200, transparent = True)
     plt.show()
