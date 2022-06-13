@@ -7,7 +7,9 @@ Santiago Sanchez-Escalonilla et al., [Total Energy Shaping with Neural Interconn
 Energy shaping allows to exploit the real dynamics of complex systems.
 ![Energy shaping example](./figures/energy_poster2.svg)
 
-The energy function, $H(x)$ (**left**), of the simple pendulum shows multiple equilibria. IDA-PBC's main objective is to shape the closed loop energy, $H_d(x)$ (**right**), such that the closed loop dynamics are stable around a desired point $x^\star$.
+The energy function of the simple pendulum, $H(x)$ (**left**),shows multiple equilibria. IDA-PBC's main objective is to shape the closed loop energy, $H_d(x)$ (**right**), such that the closed loop dynamics are stable around a desired point $x^\star$.
+
+Neural IDA-PBC enables the use of this popular nonlinear control technique to cases were finding an analytical solution that satisfies both the matching equations and structural constraints would be troublesome.
 
 ## How to use this repository
 This repository contains two working examples of mechanical systems:
